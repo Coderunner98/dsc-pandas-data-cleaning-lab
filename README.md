@@ -99,8 +99,9 @@ In the cell below, load `heroes_information.csv` as `heroes_df`:
 
 ```python
 # Your code here
-
+heroes_df = pd.read_csv('heroes_information.csv')
 heroes_df.head()
+
 ```
 
 It looks like that CSV came with an index column, resulting in an extra column called `Unnamed: 0`. We don't need that column, so write code to get rid of it below.
