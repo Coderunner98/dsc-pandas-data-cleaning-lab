@@ -100,6 +100,7 @@ In the cell below, load `heroes_information.csv` as `heroes_df`:
 ```python
 # Your code here
 
+heroes_df = pd.read_csv('heroes_information.csv')
 heroes_df.head()
 ```
 
