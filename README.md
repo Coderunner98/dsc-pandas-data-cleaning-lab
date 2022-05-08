@@ -99,7 +99,7 @@ In the cell below, load `heroes_information.csv` as `heroes_df`:
 
 ```python
 # Your code here
-
+heroes_df = pd.read_csv('heroes_information.csv')
 heroes_df.head()
 ```
 
@@ -113,7 +113,7 @@ There are two ways to do this:
 
 ```python
 # Your code here
-
+heroes_df = pd.read_csv('heroes_information.csv', index_col=0)
 heroes_df.head()
 ```
 
@@ -148,9 +148,9 @@ In the cell below, inspect the overall shape of the dataframe:
 ```python
 # Your code here
 ```
-
+heroes_df.shape
 Now let's look at the info printout:
-
+heroes_df.info()
 
 ```python
 # Run this cell without changes
@@ -175,7 +175,8 @@ Now, repeat the same process with `super_hero_powers.csv`. Name the dataframe `p
 ```python
 # Your code here (create more cells as needed)
 ```
-
+powers_df = pd.read_csv('super_hero_powers.csv', index_col=0)
+powers_df.head()
 The following code will check if it was loaded correctly:
 
 
@@ -235,9 +236,24 @@ Write your answer below, and explain how it relates to the information we have:
 ```python
 # Replace None with appropriate text
 """
-None
 """
-```
+Let's take a look at those examples. We have Chuck Norris (an actual
+person), Katniss Everdeen (a character from The Hunger Games books and
+movies), and Flash Gordon (a character from comics published by King
+Features Syndicate). It doesn't seem very sensible to fill in the
+most common publisher (to say that these are all Marvel Comics), or
+to put them all in the same "other" bucket.
+
+Also since the publisher is the only relevant variable for this
+question, we want to be more careful that the information encoded there
+is meaningful and useful. We don't want to just haphazardly fill it in
+in order to be able to run a statistical test or model.
+
+Therefore let's go with option 2, and drop all of the rows where
+the publisher is missing.
+"""
+
+
 
 Now, implement your chosen strategy using code. (You can also check the solution branch for the answer to the question above if you're really not sure.)
 
@@ -245,10 +261,10 @@ Now, implement your chosen strategy using code. (You can also check the solution
 ```python
 # Your code here
 ```
-
+heroes_df.dropna(subset=["Publisher"], inplace=True)
 Now there should be no missing values in the publisher column:
 
-
+assert heroes_df["Publisher"].isna().sum() == 0
 ```python
 # Run this cell without changes
 assert heroes_df["Publisher"].isna().sum() == 0
@@ -274,7 +290,9 @@ Identify those two cases below:
 ```python
 # Replace None with appropriate text
 """
-None
+"""
+(1) We have both "Marvel Comics" and "Marvel" (missing the word "Comics")
+(2) We have both "DC Comics" and " DC Comics" (with an extra space at the beginning)
 """
 ```
 
@@ -285,6 +303,8 @@ Now, write some code to handle these cases. If you're not sure where to start, l
 # Your code here
 ```
 
+heroes_df["Publisher"] = heroes_df["Publisher"].replace("Marvel", "Marvel Comics")
+heroes_df["Publisher"] = heroes_df["Publisher"].str.strip()
 Check your work below:
 
 
@@ -351,7 +371,21 @@ In the cell below, identify the shared key, and your strategy for joining the da
 ```python
 # Replace None with appropriate text
 """
-None
+"""
+The shared key between these datasets is the name of the superhero. In heroes_df,
+this is represented by the name column. In powers_df, this is represented by the
+column names themselves.
+
+The fact that one of them is the values of a column and the other is the column
+names means that we will need to transpose one of them first. It makes the most
+sense to transpose powers_df since that will result in records still representing
+a hero, rather than a power. This will work with the question at hand, which asks
+about heights, which are attributes of superheroes, not attributers of superpowers.
+
+powers_df has fewer columns than heroes_df has rows, but we can also see that
+powers_df contains names that are not present in heroes_df (namely '3-D Man'). So,
+it seems like an inner joing is the right approach, so that we only keep records
+that are present in both datasets.
 """
 ```
 
@@ -434,7 +468,12 @@ Let's take a look at a sample of those negative heights:
 ```python
 # Run this cell without changes
 heroes_and_powers_df[heroes_and_powers_df["Height"] < 0].sample(5, random_state=1)
-```
+
+# First, get a transposed version of the powers dataframe. This means
+# that what used to be the row index is now the column name, and vice
+# versa
+powers_df_transposed = powers_df.T
+powers_df_transposed
 
 It looks like not only are those heights negative, those weights are negative also, and all of them are set to exactly -99.0.
 
